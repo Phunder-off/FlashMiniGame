@@ -3,6 +3,7 @@ package fr.phunder.flashminigame.commands;
 import fr.phunder.flashminigame.game.Game;
 import fr.phunder.flashminigame.game.type.GameType;
 import fr.phunder.flashminigame.utils.CommandUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -59,6 +60,26 @@ public class CmdGame implements CommandExecutor {
                 }
                 gameCreate(player, gameType);
                 return true;
+            }
+            if (args[0].equalsIgnoreCase("invite")) {
+                final Game game = Game.getPlayerGame(player);
+                if (game == null) {
+                    player.sendMessage("Vous etes dans aucune partie");
+                    player.sendMessage("Pour cree une parti (/game create <type>)");
+                    return true;
+                }
+                if (!game.isOwer(player)){
+                    player.sendMessage("Vous ne pouvais pas faire cela car vous n'etes pas le chef de votre partie");
+                    return true;
+                }
+                Player targetPlayer = Bukkit.getPlayer(args[1]);
+                if (targetPlayer == null || !targetPlayer.isOnline()) {
+                    player.sendMessage("Joueur introuvable");
+                    return true;
+                }
+                Game.addPlayerInviteMap(player, targetPlayer);
+                player.sendMessage("Invitation envoyer a " + targetPlayer.getDisplayName());
+                targetPlayer.sendMessage(player.getDisplayName() + " vous a invite dans sa partie (" + game.getGameType().getDisplayName() + ")");
             }
         }
         return false;

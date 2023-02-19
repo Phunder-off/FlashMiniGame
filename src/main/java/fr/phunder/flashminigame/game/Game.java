@@ -1,6 +1,7 @@
 package fr.phunder.flashminigame.game;
 
 import fr.phunder.flashminigame.Plugin;
+import fr.phunder.flashminigame.game.type.GameType;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 public abstract class Game {
     private UUID uuid;
+    private GameType gameType;
     private Player owner;
     private List<Player> players = new ArrayList<>();
     private GameStatus gameStatus = GameStatus.WAITING;
@@ -30,8 +32,20 @@ public abstract class Game {
         return owner;
     }
 
+    public boolean isOwer(Player player){
+        return getOwner().equals(player);
+    }
+
     public void setOwner(Player owner) {
         this.owner = owner;
+    }
+
+    public GameType getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
     }
 
     public List<Player> getPlayers() {
@@ -44,7 +58,7 @@ public abstract class Game {
 
     public void removePlayers(Player player) {
         this.players.remove(player);
-        if (!getPlayers().isEmpty()){
+        if (!getPlayers().isEmpty() && getOwner().equals(player)) {
             this.setOwner(getPlayers().get(0));
             this.getOwner().sendMessage("Tu est devenu chef de ta partie");
         }
@@ -82,8 +96,21 @@ public abstract class Game {
     public static void removePlayerGameMap(Player player) {
         Plugin.playerGameMap.remove(player);
     }
+
     public static void addPlayerGameMap(Player player, Game game) {
         Plugin.playerGameMap.put(player, game);
     }
+
+    public static List<Player> getPlayerInviteMap(Player player){
+        return Plugin.playerInviteMap.get(player);
+    }
+
+    public static void addPlayerInviteMap(Player player, Player target){
+        final List<Player> targetInviteMap = getPlayerInviteMap(target);
+        targetInviteMap.add(player);
+        Plugin.playerInviteMap.put(target, targetInviteMap);
+    }
+
+
 
 }

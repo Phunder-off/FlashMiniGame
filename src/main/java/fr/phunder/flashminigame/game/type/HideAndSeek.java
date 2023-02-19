@@ -7,5 +7,6 @@ public class HideAndSeek extends Game {
 
     public HideAndSeek(Player player) {
         super(player);
+        setGameType(GameType.HIDEANDSEEK);
     }
 }
