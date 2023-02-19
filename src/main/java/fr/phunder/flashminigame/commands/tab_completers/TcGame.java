@@ -23,7 +23,7 @@ public class TcGame implements TabCompleter {
         final int nbrArgs = args.length;
 
         if (nbrArgs == 1) {
-            return Arrays.asList("types", "create", "leave");
+            return Arrays.asList("types", "create", "leave", "invite");
         }
 
         if (nbrArgs == 2) {

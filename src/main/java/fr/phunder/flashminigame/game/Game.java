@@ -2,18 +2,20 @@ package fr.phunder.flashminigame.game;
 
 import fr.phunder.flashminigame.Plugin;
 import fr.phunder.flashminigame.game.type.GameType;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class Game {
     private UUID uuid;
     private GameType gameType;
-    private Player owner;
-    private List<Player> players = new ArrayList<>();
+    private UUID owner;
+    private List<UUID> players = new ArrayList<>();
     private GameStatus gameStatus = GameStatus.WAITING;
     private Timestamp timeStart;
     private Timestamp timeEnd;
@@ -29,7 +31,7 @@ public abstract class Game {
     }
 
     public Player getOwner() {
-        return owner;
+        return Bukkit.getPlayer(owner);
     }
 
     public boolean isOwer(Player player){
@@ -37,7 +39,7 @@ public abstract class Game {
     }
 
     public void setOwner(Player owner) {
-        this.owner = owner;
+        this.owner = owner.getUniqueId();
     }
 
     public GameType getGameType() {
@@ -49,16 +51,16 @@ public abstract class Game {
     }
 
     public List<Player> getPlayers() {
-        return players;
+        return players.stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList());
     }
 
     public void addPlayers(Player player) {
-        this.players.add(player);
+        this.players.add(player.getUniqueId());
     }
 
     public void removePlayers(Player player) {
-        this.players.remove(player);
-        if (!getPlayers().isEmpty() && getOwner().equals(player)) {
+        this.players.remove(player.getUniqueId());
+        if (!getPlayers().isEmpty() && getOwner().equals(player.getUniqueId())) {
             this.setOwner(getPlayers().get(0));
             this.getOwner().sendMessage("Tu est devenu chef de ta partie");
         }
@@ -90,25 +92,23 @@ public abstract class Game {
     }
 
     public static Game getPlayerGame(Player player) {
-        return Plugin.playerGameMap.get(player);
+        return Plugin.playerGameMap.get(player.getUniqueId());
     }
 
     public static void removePlayerGameMap(Player player) {
-        Plugin.playerGameMap.remove(player);
+        Plugin.playerGameMap.remove(player.getUniqueId());
     }
 
     public static void addPlayerGameMap(Player player, Game game) {
-        Plugin.playerGameMap.put(player, game);
+        Plugin.playerGameMap.put(player.getUniqueId(), game);
     }
 
     public static List<Player> getPlayerInviteMap(Player player){
-        return Plugin.playerInviteMap.get(player);
+        return Plugin.playerInviteMap.get(player.getUniqueId()).stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList());
     }
 
     public static void addPlayerInviteMap(Player player, Player target){
-        final List<Player> targetInviteMap = getPlayerInviteMap(target);
-        targetInviteMap.add(player);
-        Plugin.playerInviteMap.put(target, targetInviteMap);
+        Plugin.playerInviteMap.computeIfAbsent(target.getUniqueId(), k -> new ArrayList<>()).add(player.getUniqueId());
     }
 
 

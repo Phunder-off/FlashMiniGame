@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class CmdGame implements CommandExecutor {
 
@@ -21,6 +22,8 @@ public class CmdGame implements CommandExecutor {
 
         final Player player = CommandUtils.senderIsPlayer(sender);
         if (player == null) return true;
+
+
 
         final int nbrArgs = args.length;
 
@@ -61,6 +64,7 @@ public class CmdGame implements CommandExecutor {
                 gameCreate(player, gameType);
                 return true;
             }
+
             if (args[0].equalsIgnoreCase("invite")) {
                 final Game game = Game.getPlayerGame(player);
                 if (game == null) {
