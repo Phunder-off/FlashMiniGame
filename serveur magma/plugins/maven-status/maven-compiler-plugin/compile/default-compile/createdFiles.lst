@@ -1,0 +1,9 @@
+fr\phunder\flashminigame\game\type\GameType.class
+fr\phunder\flashminigame\commands\CmdGame.class
+fr\phunder\flashminigame\game\Game.class
+fr\phunder\flashminigame\utils\CommandUtils.class
+fr\phunder\flashminigame\commands\CmdPing.class
+fr\phunder\flashminigame\Plugin.class
+fr\phunder\flashminigame\game\GameStatus.class
+fr\phunder\flashminigame\commands\tab_completers\TcGame.class
+fr\phunder\flashminigame\game\type\HideAndSeek.class
