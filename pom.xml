@@ -24,8 +24,7 @@
     </dependencies>
 
     <build>
-        <directory>C:\Users\CePC\Desktop\serveur magma\plugins</directory>
-
+        <directory>.\serveur magma\plugins</directory>
     </build>
 
 </project>
