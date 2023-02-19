@@ -17,8 +17,6 @@ public enum GameType {
         this.gameClass = gameClass;
     }
 
-
-
     public Class<Game> getGameClass() {
         return gameClass;
     }
@@ -39,8 +37,4 @@ public enum GameType {
     public static List<String> getAllDisplayName() {
         return Arrays.stream(GameType.values()).map(GameType::getDisplayName).collect(Collectors.toList());
     }
-
-
-
-
 }

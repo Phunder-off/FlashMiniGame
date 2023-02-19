@@ -58,6 +58,7 @@ public class CmdGame implements CommandExecutor {
                     return true;
                 }
                 gameCreate(player, gameType);
+                return true;
             }
         }
         return false;
