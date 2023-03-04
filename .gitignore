@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 serveur magma/
+jdk1.8.0_251/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -37,3 +38,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
