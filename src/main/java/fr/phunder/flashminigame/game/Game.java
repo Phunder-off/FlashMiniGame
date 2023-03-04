@@ -104,7 +104,7 @@ public abstract class Game {
     }
 
     public static List<Player> getPlayerInviteMap(Player player){
-        return Plugin.playerInviteMap.get(player.getUniqueId()).stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList());
+        return Plugin.playerInviteMap.get(player.getUniqueId()).stream().map(Bukkit::getPlayer).collect(Collectors.toList());
     }
 
     public static void addPlayerInviteMap(Player player, Player target){

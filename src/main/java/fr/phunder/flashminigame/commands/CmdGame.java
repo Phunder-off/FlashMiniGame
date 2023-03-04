@@ -23,8 +23,6 @@ public class CmdGame implements CommandExecutor {
         final Player player = CommandUtils.senderIsPlayer(sender);
         if (player == null) return true;
 
-
-
         final int nbrArgs = args.length;
 
         if (nbrArgs == 0) return false;
@@ -82,8 +80,9 @@ public class CmdGame implements CommandExecutor {
                     return true;
                 }
                 Game.addPlayerInviteMap(player, targetPlayer);
-                player.sendMessage("Invitation envoyer a " + targetPlayer.getDisplayName());
+                player.sendMessage("Invitation envoyée a " + targetPlayer.getDisplayName());
                 targetPlayer.sendMessage(player.getDisplayName() + " vous a invite dans sa partie (" + game.getGameType().getDisplayName() + ")");
+                return true;
             }
         }
         return false;

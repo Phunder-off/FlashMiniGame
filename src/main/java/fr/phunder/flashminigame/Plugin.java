@@ -15,8 +15,6 @@ public class Plugin extends JavaPlugin {
     public static Map<UUID, Game> playerGameMap = new HashMap<>();
     public static Map<UUID, List<UUID>> playerInviteMap = new HashMap<>();
 
-
-
     @Override
     public void onEnable() {
         getCommand("ping").setExecutor(new CmdPing());
