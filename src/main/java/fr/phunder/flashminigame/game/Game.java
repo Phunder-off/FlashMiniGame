@@ -2,6 +2,8 @@ package fr.phunder.flashminigame.game;
 
 import fr.phunder.flashminigame.Plugin;
 import fr.phunder.flashminigame.game.type.GameType;
+import fr.phunder.flashminigame.utils.message.MessageType;
+import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -64,7 +66,7 @@ public abstract class Game {
         this.players.remove(player.getUniqueId());
         if (!getPlayers().isEmpty() && getOwner().equals(player.getUniqueId())) {
             this.setOwner(getPlayers().get(0));
-            this.getOwner().sendMessage("Tu est devenu chef de ta partie");
+            MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "game.new-owner");
         }
         removePlayerGameMap(player);
     }

@@ -6,6 +6,9 @@ import fr.phunder.flashminigame.utils.CommandUtils;
 import fr.phunder.flashminigame.utils.message.MessageType;
 import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CmdGame implements CommandExecutor {
 
@@ -50,7 +54,25 @@ public class CmdGame implements CommandExecutor {
                 player.sendMessage("============ Help ============");
                 return true;
             }
+            if (args[0].equalsIgnoreCase("players")) {
+                final Game game = Game.getPlayerGame(player);
+                if (game == null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
+                    return true;
+                }
+                String players = game.getPlayers().stream().map(Player::getDisplayName).collect(Collectors.toList()).toString();
 
+                MessageUtils.playerMsg(
+                        player,
+                        MessageType.INFO,
+                        "game.players",
+                        new HashMap<String, String>() {{
+                            put("{owner}", game.getOwner().getDisplayName());
+                            put("{players}", players);
+                        }}
+                );
+                return true;
+            }
         }
 
         if (nbrArgs == 2) {
@@ -130,7 +152,7 @@ public class CmdGame implements CommandExecutor {
                     return true;
                 }
                 final Game gameTarget = Game.getPlayerGame(targetPlayer);
-                if (gameTarget != null) {
+                if (gameTarget == null) {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.exist");
                 }
                 gameTarget.addPlayers(player);
@@ -187,6 +209,7 @@ public class CmdGame implements CommandExecutor {
                             put("{player}", player.getDisplayName());
                         }}
                 );
+                return true;
             }
         }
         return false;
@@ -211,7 +234,15 @@ public class CmdGame implements CommandExecutor {
     }
 
     private void gameTypes(Player player) {
-        player.sendMessage("Liste de mode de jeux");
-        Arrays.stream(GameType.values()).forEach(gameType -> player.sendMessage("- " + gameType.getDisplayName()));
+        String types =
+                Arrays.stream(GameType.values()).map(GameType::getDisplayName).collect(Collectors.toList()).toString();
+        MessageUtils.playerMsg(
+                player,
+                MessageType.INFO,
+                "game.type.list",
+                new HashMap<String, String>() {{
+                    put("{types}", types);
+                }}
+        );
     }
 }

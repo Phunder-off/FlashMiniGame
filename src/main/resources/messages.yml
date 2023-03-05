@@ -3,6 +3,7 @@ player:
 
 game:
   in: "Vous êtes déjà dans une partie."
+  players: "Liste des joueur de votre partie ({owner} est le Chef) : \n{players}"
   create:
     success: "Vous venez de créer une partie de type {gameType}."
     error: "La partie n'a pas pu être créée. Veuillez réessayer ultérieurement."
@@ -24,4 +25,6 @@ game:
     sender: "Vous avez invité {target} à rejoindre votre partie de {gameType} !"
     receiver: "Vous avez été invité par {sender} à rejoindre une partie de type {gameType}. \nPour accepter l'invitation, tapez §b/game join {sender}."
   type:
+    list: "Voici la liste des modes de jeux : \n{types}"
     not-exist: "Ce mode de jeu n'existe pas !"
+  new-owner: "Tu est devenu chef la partie !"
