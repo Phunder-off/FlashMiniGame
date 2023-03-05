@@ -3,6 +3,8 @@ package fr.phunder.flashminigame.commands;
 import fr.phunder.flashminigame.game.Game;
 import fr.phunder.flashminigame.game.type.GameType;
 import fr.phunder.flashminigame.utils.CommandUtils;
+import fr.phunder.flashminigame.utils.message.MessageType;
+import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,6 +13,8 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class CmdGame implements CommandExecutor {
@@ -35,27 +39,31 @@ public class CmdGame implements CommandExecutor {
             if (args[0].equalsIgnoreCase("leave")) {
                 final Game game = Game.getPlayerGame(player);
                 if (game == null) {
-                    player.sendMessage("Vous etes dans aucune partie");
-                    player.sendMessage("Pour cree une parti (/game create <type>)");
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
                     return true;
                 }
                 game.removePlayers(player);
-                player.sendMessage("Vous venez de quitter votre partie");
+                MessageUtils.playerMsg(player, MessageType.INFO, "game.leave");
                 return true;
             }
+            if (args[0].equalsIgnoreCase("help")) {
+                player.sendMessage("============ Help ============");
+                return true;
+            }
+
         }
 
         if (nbrArgs == 2) {
             if (args[0].equalsIgnoreCase("create")) {
                 final Game game = Game.getPlayerGame(player);
                 if (game != null) {
-                    player.sendMessage("Vous etes deja dans une partie " + game.getGameStatus().getDisplayName());
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.in");
                     return true;
                 }
 
                 GameType gameType = GameType.getType(args[1]);
                 if (!GameType.getAllDisplayName().contains(args[1]) && gameType == null) {
-                    player.sendMessage("Ce mode de jeu n'existe pas !");
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.type.not-exist");
                     gameTypes(player);
                     return true;
                 }
@@ -66,23 +74,119 @@ public class CmdGame implements CommandExecutor {
             if (args[0].equalsIgnoreCase("invite")) {
                 final Game game = Game.getPlayerGame(player);
                 if (game == null) {
-                    player.sendMessage("Vous etes dans aucune partie");
-                    player.sendMessage("Pour cree une parti (/game create <type>)");
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
                     return true;
                 }
-                if (!game.isOwer(player)){
-                    player.sendMessage("Vous ne pouvais pas faire cela car vous n'etes pas le chef de votre partie");
+                if (!game.isOwer(player)) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.ower");
                     return true;
                 }
                 Player targetPlayer = Bukkit.getPlayer(args[1]);
                 if (targetPlayer == null || !targetPlayer.isOnline()) {
-                    player.sendMessage("Joueur introuvable");
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "player.not-found");
                     return true;
                 }
                 Game.addPlayerInviteMap(player, targetPlayer);
-                player.sendMessage("Invitation envoyée a " + targetPlayer.getDisplayName());
-                targetPlayer.sendMessage(player.getDisplayName() + " vous a invite dans sa partie (" + game.getGameType().getDisplayName() + ")");
+
+                MessageUtils.playerMsg(
+                        player,
+                        MessageType.INFO,
+                        "game.invite.sender",
+                        new HashMap<String, String>() {{
+                            put("{target}", targetPlayer.getDisplayName());
+                            put("{gameType}", game.getGameType().getDisplayName());
+                        }}
+                );
+                MessageUtils.playerMsg(
+                        targetPlayer,
+                        MessageType.INFO,
+                        "game.invite.receiver",
+                        new HashMap<String, String>() {{
+                            put("{sender}", player.getDisplayName());
+                            put("{gameType}", game.getGameType().getDisplayName());
+                        }}
+                );
                 return true;
+            }
+
+            if (args[0].equalsIgnoreCase("join")) {
+                final Game game = Game.getPlayerGame(player);
+                if (game != null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.in");
+                    return true;
+                }
+                final Player targetPlayer = Bukkit.getPlayer(args[1]);
+                if (targetPlayer == null || !targetPlayer.isOnline()) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "player.not-found");
+                    return true;
+                }
+                final List<UUID> invitations = Game.getPlayerInviteMap(player);
+                if (invitations == null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.invite");
+                    return true;
+                }
+                if (!invitations.contains(targetPlayer.getUniqueId())) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.invite-by");
+                    return true;
+                }
+                final Game gameTarget = Game.getPlayerGame(targetPlayer);
+                if (gameTarget != null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.exist");
+                }
+                gameTarget.addPlayers(player);
+                Game.removePlayerInviteMap(player, targetPlayer);
+                MessageUtils.playerMsg(
+                        player,
+                        MessageType.INFO,
+                        "game.join.guest",
+                        new HashMap<String, String>() {{
+                            put("{target}", targetPlayer.getDisplayName());
+                        }}
+                );
+                MessageUtils.playerMsg(
+                        targetPlayer,
+                        MessageType.INFO,
+                        "game.join.owner",
+                        new HashMap<String, String>() {{
+                            put("{player}", player.getDisplayName());
+                        }}
+                );
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("kick")) {
+                final Game game = Game.getPlayerGame(player);
+                if (game == null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
+                    return true;
+                }
+                if (!game.isOwer(player)) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.ower");
+                    return true;
+                }
+                Player targetPlayer = Bukkit.getPlayer(args[1]);
+                if (targetPlayer == null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "player.not-found");
+                    return true;
+                }
+
+                game.removePlayers(targetPlayer);
+                MessageUtils.playerMsg(
+                        player,
+                        MessageType.INFO,
+                        "game.kick.owner",
+                        new HashMap<String, String>() {{
+                            put("{target}", targetPlayer.getDisplayName());
+                        }}
+                );
+                MessageUtils.playerMsg(
+                        targetPlayer,
+                        MessageType.WARNING,
+                        "game.kick.target",
+                        new HashMap<String, String>() {{
+                            put("{player}", player.getDisplayName());
+                        }}
+                );
             }
         }
         return false;
@@ -93,9 +197,16 @@ public class CmdGame implements CommandExecutor {
             Constructor<Game> constructor = gameType.getGameClass().getDeclaredConstructor(Player.class);
             Game game = constructor.newInstance(player);
             Game.addPlayerGameMap(player, game);
-            player.sendMessage("Partie créer avec succes (" + game.getUuid() + ")");
+            MessageUtils.playerMsg(
+                    player,
+                    MessageType.INFO,
+                    "game.create.success",
+                    new HashMap<String, String>() {{
+                        put("{gameType}", gameType.getDisplayName());
+                    }}
+            );
         } catch (Exception e) {
-            player.sendMessage("Echec de la creation de la partie !");
+            MessageUtils.playerMsg(player, MessageType.INFO, "game.create.error");
         }
     }
 

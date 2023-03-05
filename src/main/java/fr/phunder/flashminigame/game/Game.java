@@ -3,6 +3,7 @@ package fr.phunder.flashminigame.game;
 import fr.phunder.flashminigame.Plugin;
 import fr.phunder.flashminigame.game.type.GameType;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
@@ -56,6 +57,7 @@ public abstract class Game {
 
     public void addPlayers(Player player) {
         this.players.add(player.getUniqueId());
+        addPlayerGameMap(player, this);
     }
 
     public void removePlayers(Player player) {
@@ -64,7 +66,7 @@ public abstract class Game {
             this.setOwner(getPlayers().get(0));
             this.getOwner().sendMessage("Tu est devenu chef de ta partie");
         }
-        Game.removePlayerGameMap(player);
+        removePlayerGameMap(player);
     }
 
     public GameStatus getGameStatus() {
@@ -103,12 +105,17 @@ public abstract class Game {
         Plugin.playerGameMap.put(player.getUniqueId(), game);
     }
 
-    public static List<Player> getPlayerInviteMap(Player player){
-        return Plugin.playerInviteMap.get(player.getUniqueId()).stream().map(Bukkit::getPlayer).collect(Collectors.toList());
+    public static List<UUID> getPlayerInviteMap(Player player){
+        return Plugin.playerInviteMap.get(player.getUniqueId());
     }
 
     public static void addPlayerInviteMap(Player player, Player target){
         Plugin.playerInviteMap.computeIfAbsent(target.getUniqueId(), k -> new ArrayList<>()).add(player.getUniqueId());
+    }
+    public static void removePlayerInviteMap(Player player, Player target){
+        final List<UUID> playerInviteMap = getPlayerInviteMap(player);
+        playerInviteMap.remove(target.getUniqueId());
+        Plugin.playerInviteMap.put(player.getUniqueId(), playerInviteMap);
     }
 
 

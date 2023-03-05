@@ -1,0 +1,27 @@
+player:
+  not-found: "Joueur introuvable !"
+
+game:
+  in: "Vous êtes déjà dans une partie."
+  create:
+    success: "Vous venez de créer une partie de type {gameType}."
+    error: "La partie n'a pas pu être créée. Veuillez réessayer ultérieurement."
+  join:
+    guest: "Vous avez rejoint la partie de {target}."
+    owner: "{player} vient de rejoindre votre partie !"
+  leave: "Vous avez quitté votre partie avec succès."
+  kick:
+    owner: "Vous avez exclu {target} de votre partie."
+    target: "Vous avez été expulsé de la partie par {player}"
+  already-in : "Vous êtes déjà dans une partie. \nVous devez quitter votre partie actuelle pour en créer une nouvelle ou rejoindre une autre."
+  not:
+    in: "Vous n'êtes actuellement dans aucune partie. \nPour en créer une, utilisez la commande /game create <type>."
+    ower: "Vous n'êtes pas le propriétaire de cette partie."
+    invite: "Vous n'avez aucune invitation en attente."
+    invite-by: "Vous n'avez pas d'invitation en attente de {player}."
+    exist: "Le parti que vous essayez de rejoindre n'existe plus."
+  invite:
+    sender: "Vous avez invité {target} à rejoindre votre partie de {gameType} !"
+    receiver: "Vous avez été invité par {sender} à rejoindre une partie de type {gameType}. \nPour accepter l'invitation, tapez §b/game join {sender}."
+  type:
+    not-exist: "Ce mode de jeu n'existe pas !"

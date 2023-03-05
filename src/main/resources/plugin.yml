@@ -11,6 +11,6 @@ commands:
     executor: fr.phunder.flashminigame.commands.CmdPing
   game:
     description: Cette command sers a la gestion des game.
-    usage: /game <types>
+    usage: /game help
     permission: fmg.game
     executor: fr.phunder.flashminigame.commands.CmdGame
