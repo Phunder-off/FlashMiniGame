@@ -14,7 +14,7 @@ public class MessageUtils {
         for (String key : args.keySet()) {
             message = message.replace(key, args.get(key));
         }
-        playerMsg(player, type, message);
+        player.sendMessage(type.getColor() + "[" + type.getPrefix() + "] " + message);
     }
 
 }
