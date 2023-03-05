@@ -28,3 +28,9 @@ game:
     list: "Voici la liste des modes de jeux : \n{types}"
     not-exist: "Ce mode de jeu n'existe pas !"
   new-owner: "Tu est devenu chef la partie !"
+
+world:
+  create: "Le monde {name} a été créé avec succès ! \nPour vous y rendre, utilisez la commande /world tp {name}."
+  tp: "Vous avez été téléporté dans le monde {name} !"
+  not:
+    exist: "Le monde '{name}' n'existe pas."
