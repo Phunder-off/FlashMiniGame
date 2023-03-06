@@ -14,7 +14,7 @@ game:
   kick:
     owner: "Vous avez exclu {target} de votre partie."
     target: "Vous avez été expulsé de la partie par {player}"
-  already-in : "Vous êtes déjà dans une partie. \nVous devez quitter votre partie actuelle pour en créer une nouvelle ou rejoindre une autre."
+  already-in: "Vous êtes déjà dans une partie. \nVous devez quitter votre partie actuelle pour en créer une nouvelle ou rejoindre une autre."
   not:
     in: "Vous n'êtes actuellement dans aucune partie. \nPour en créer une, utilisez la commande /game create <type>."
     ower: "Vous n'êtes pas le propriétaire de cette partie."
@@ -30,7 +30,12 @@ game:
   new-owner: "Tu est devenu chef la partie !"
 
 world:
-  create: "Le monde {name} a été créé avec succès ! \nPour vous y rendre, utilisez la commande /world tp {name}."
-  tp: "Vous avez été téléporté dans le monde {name} !"
+  create:
+    success: "Le monde {world} a été créé avec succès ! \nPour vous y rendre, utilisez la commande /world tp {world}."
+    error: "Une erreur s'est produite lors de la création du monde {world} !"
+  load:
+    success: "Le monde {world} a été chargé avec succès !"
+    error: "Impossible de charger le monde {world} !"
+  tp: "Vous avez été téléporté dans le monde {world} !"
   not:
-    exist: "Le monde '{name}' n'existe pas."
+    exist: "Le monde {world} n'existe pas."

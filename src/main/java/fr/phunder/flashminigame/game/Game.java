@@ -2,23 +2,28 @@ package fr.phunder.flashminigame.game;
 
 import fr.phunder.flashminigame.Plugin;
 import fr.phunder.flashminigame.game.type.GameType;
+import fr.phunder.flashminigame.utils.WorldUtils;
 import fr.phunder.flashminigame.utils.message.MessageType;
 import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public abstract class Game {
-    private UUID uuid;
+
+    private final UUID uuid;
+    private World world;
     private GameType gameType;
     private UUID owner;
-    private List<UUID> players = new ArrayList<>();
+    private final List<UUID> players = new ArrayList<>();
     private GameStatus gameStatus = GameStatus.WAITING;
     private Timestamp timeStart;
     private Timestamp timeEnd;
@@ -29,15 +34,57 @@ public abstract class Game {
         this.addPlayers(player);
     }
 
+    public void start() {
+        final String worldTemplate = "world-fmg-" + this.getGameType().getDisplayName() + "-Template/";
+        final String worldName = "game-" + this.getUuid();
+
+        if (!WorldUtils.duplicateWorld(worldTemplate, worldName)) {
+            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.create.error",new HashMap<String,String>(){{
+                put("{world}", worldName);
+            }});
+            return;
+        }
+
+        final World world = WorldUtils.loadWorld(worldName);
+        if (world == null) {
+            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.load.error",new HashMap<String,String>(){{
+                put("{world}", worldName);
+            }});
+            return;
+        }
+
+        this.world = world;
+
+        //this.getPlayers().forEach(player -> player.teleport(this.getWorld().getSpawnLocation()));
+
+        //new Thread(() -> {
+        //    for (int i = 5; i > 0; i--) {
+        //        for (Player player : getPlayers()) {
+        //            player.sendTitle(String.valueOf(i), "La partie va commencer", 5, 20, 5);
+        //        }
+
+        //        try {
+        //            Thread.sleep(1000);
+        //        } catch (InterruptedException e) {
+        //            e.printStackTrace();
+        //        }
+        //    }
+        //}).start();
+    }
+
     public UUID getUuid() {
         return uuid;
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     public Player getOwner() {
         return Bukkit.getPlayer(owner);
     }
 
-    public boolean isOwer(Player player){
+    public boolean isOwner(Player player) {
         return getOwner().equals(player);
     }
 
@@ -54,7 +101,7 @@ public abstract class Game {
     }
 
     public List<Player> getPlayers() {
-        return players.stream().map(uuid -> Bukkit.getPlayer(uuid)).collect(Collectors.toList());
+        return players.stream().map(Bukkit::getPlayer).collect(Collectors.toList());
     }
 
     public void addPlayers(Player player) {
@@ -107,19 +154,19 @@ public abstract class Game {
         Plugin.playerGameMap.put(player.getUniqueId(), game);
     }
 
-    public static List<UUID> getPlayerInviteMap(Player player){
+    public static List<UUID> getPlayerInviteMap(Player player) {
         return Plugin.playerInviteMap.get(player.getUniqueId());
     }
 
-    public static void addPlayerInviteMap(Player player, Player target){
+    public static void addPlayerInviteMap(Player player, Player target) {
         Plugin.playerInviteMap.computeIfAbsent(target.getUniqueId(), k -> new ArrayList<>()).add(player.getUniqueId());
     }
-    public static void removePlayerInviteMap(Player player, Player target){
+
+    public static void removePlayerInviteMap(Player player, Player target) {
         final List<UUID> playerInviteMap = getPlayerInviteMap(player);
         playerInviteMap.remove(target.getUniqueId());
         Plugin.playerInviteMap.put(player.getUniqueId(), playerInviteMap);
     }
-
 
 
 }

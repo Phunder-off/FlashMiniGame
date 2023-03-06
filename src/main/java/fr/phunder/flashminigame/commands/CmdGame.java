@@ -6,9 +6,6 @@ import fr.phunder.flashminigame.utils.CommandUtils;
 import fr.phunder.flashminigame.utils.message.MessageType;
 import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -62,15 +59,24 @@ public class CmdGame implements CommandExecutor {
                 }
                 String players = game.getPlayers().stream().map(Player::getDisplayName).collect(Collectors.toList()).toString();
 
-                MessageUtils.playerMsg(
-                        player,
-                        MessageType.INFO,
-                        "game.players",
-                        new HashMap<String, String>() {{
-                            put("{owner}", game.getOwner().getDisplayName());
-                            put("{players}", players);
-                        }}
-                );
+                MessageUtils.playerMsg(player, MessageType.INFO, "game.players", new HashMap<String, String>() {{
+                    put("{owner}", game.getOwner().getDisplayName());
+                    put("{players}", players);
+                }});
+
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("start")) {
+                final Game game = Game.getPlayerGame(player);
+                if (game == null) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
+                    return true;
+                }
+                if (!game.isOwner(player)) {
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.ower");
+                    return true;
+                }
+                game.start();
                 return true;
             }
         }
@@ -99,7 +105,7 @@ public class CmdGame implements CommandExecutor {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
                     return true;
                 }
-                if (!game.isOwer(player)) {
+                if (!game.isOwner(player)) {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.ower");
                     return true;
                 }
@@ -110,19 +116,13 @@ public class CmdGame implements CommandExecutor {
                 }
                 Game.addPlayerInviteMap(player, targetPlayer);
 
-                MessageUtils.playerMsg(
-                        player,
-                        MessageType.INFO,
-                        "game.invite.sender",
+                MessageUtils.playerMsg(player, MessageType.INFO, "game.invite.sender",
                         new HashMap<String, String>() {{
                             put("{target}", targetPlayer.getDisplayName());
                             put("{gameType}", game.getGameType().getDisplayName());
                         }}
                 );
-                MessageUtils.playerMsg(
-                        targetPlayer,
-                        MessageType.INFO,
-                        "game.invite.receiver",
+                MessageUtils.playerMsg(targetPlayer, MessageType.INFO, "game.invite.receiver",
                         new HashMap<String, String>() {{
                             put("{sender}", player.getDisplayName());
                             put("{gameType}", game.getGameType().getDisplayName());
@@ -157,18 +157,13 @@ public class CmdGame implements CommandExecutor {
                 }
                 gameTarget.addPlayers(player);
                 Game.removePlayerInviteMap(player, targetPlayer);
-                MessageUtils.playerMsg(
-                        player,
-                        MessageType.INFO,
-                        "game.join.guest",
+
+                MessageUtils.playerMsg(player, MessageType.INFO, "game.join.guest",
                         new HashMap<String, String>() {{
                             put("{target}", targetPlayer.getDisplayName());
                         }}
                 );
-                MessageUtils.playerMsg(
-                        targetPlayer,
-                        MessageType.INFO,
-                        "game.join.owner",
+                MessageUtils.playerMsg(targetPlayer, MessageType.INFO, "game.join.owner",
                         new HashMap<String, String>() {{
                             put("{player}", player.getDisplayName());
                         }}
@@ -182,7 +177,7 @@ public class CmdGame implements CommandExecutor {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
                     return true;
                 }
-                if (!game.isOwer(player)) {
+                if (!game.isOwner(player)) {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.ower");
                     return true;
                 }
@@ -220,10 +215,8 @@ public class CmdGame implements CommandExecutor {
             Constructor<Game> constructor = gameType.getGameClass().getDeclaredConstructor(Player.class);
             Game game = constructor.newInstance(player);
             Game.addPlayerGameMap(player, game);
-            MessageUtils.playerMsg(
-                    player,
-                    MessageType.INFO,
-                    "game.create.success",
+
+            MessageUtils.playerMsg(player, MessageType.INFO, "game.create.success",
                     new HashMap<String, String>() {{
                         put("{gameType}", gameType.getDisplayName());
                     }}
@@ -234,15 +227,9 @@ public class CmdGame implements CommandExecutor {
     }
 
     private void gameTypes(Player player) {
-        String types =
-                Arrays.stream(GameType.values()).map(GameType::getDisplayName).collect(Collectors.toList()).toString();
-        MessageUtils.playerMsg(
-                player,
-                MessageType.INFO,
-                "game.type.list",
-                new HashMap<String, String>() {{
-                    put("{types}", types);
-                }}
-        );
+        List<String> types = Arrays.stream(GameType.values()).map(GameType::getDisplayName).collect(Collectors.toList());
+        MessageUtils.playerMsg(player, MessageType.INFO, "game.type.list", new HashMap<String, String>() {{
+            put("{types}", types.toString());
+        }});
     }
 }

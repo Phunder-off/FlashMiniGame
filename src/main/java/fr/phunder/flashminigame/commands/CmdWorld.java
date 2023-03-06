@@ -33,7 +33,7 @@ public class CmdWorld implements CommandExecutor {
                         MessageType.INFO,
                         "world.create",
                         new HashMap<String, String>() {{
-                            put("{name}", args[1]);
+                            put("{world}", args[1]);
                         }}
                 );
                 return true;
@@ -41,25 +41,17 @@ public class CmdWorld implements CommandExecutor {
             if (args[0].equalsIgnoreCase("tp")) {
                 World world = Bukkit.getWorld(args[1]);
                 if (world == null) {
-                    MessageUtils.playerMsg(
-                            player,
-                            MessageType.ERROR,
-                            "world.not.exist",
+                    MessageUtils.playerMsg(player, MessageType.ERROR, "world.not.exist",
                             new HashMap<String, String>() {{
-                                put("{name}", args[1]);
+                                put("{world}", args[1]);
                             }}
                     );
                     return true;
                 }
                 player.teleport(world.getSpawnLocation());
-                MessageUtils.playerMsg(
-                        player,
-                        MessageType.INFO,
-                        "world.tp",
-                        new HashMap<String, String>() {{
-                            put("{name}", args[1]);
-                        }}
-                );
+                MessageUtils.playerMsg(player, MessageType.INFO, "world.tp", new HashMap<String, String>() {{
+                    put("{world}", args[1]);
+                }});
                 return true;
             }
         }

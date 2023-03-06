@@ -16,7 +16,6 @@ public class MessageUtils {
         }
         player.sendMessage(type.getColor() + "[" + type.getPrefix() + "] " + message);
     }
-
 }
 
 
