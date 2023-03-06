@@ -1,5 +1,17 @@
 [
   {
+    "uuid": "3e1a6a83-d714-37c3-b447-061a8f17375c",
+    "name": "Phunder",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
+    "uuid": "8921de22-0360-3391-b8b3-fabf6e373188",
+    "name": "Joueur-de-test",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
     "uuid": "de38b9f7-8ff8-4847-b206-ccf8a861a629",
     "name": "Phunder",
     "level": 4,
