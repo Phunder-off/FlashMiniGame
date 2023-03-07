@@ -38,8 +38,9 @@ public abstract class Game {
         final String worldTemplate = "world-fmg-" + this.getGameType().getDisplayName() + "-Template/";
         final String worldName = "game-" + this.getUuid();
 
+        MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "world.create.waiting");
         if (!WorldUtils.duplicateWorld(worldTemplate, worldName)) {
-            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.create.error",new HashMap<String,String>(){{
+            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.create.error", new HashMap<String,String>(){{
                 put("{world}", worldName);
             }});
             return;
@@ -55,21 +56,20 @@ public abstract class Game {
 
         this.world = world;
 
-        //this.getPlayers().forEach(player -> player.teleport(this.getWorld().getSpawnLocation()));
+        this.getPlayers().forEach(player -> player.teleport(this.getWorld().getSpawnLocation()));
 
-        //new Thread(() -> {
-        //    for (int i = 5; i > 0; i--) {
-        //        for (Player player : getPlayers()) {
-        //            player.sendTitle(String.valueOf(i), "La partie va commencer", 5, 20, 5);
-        //        }
-
-        //        try {
-        //            Thread.sleep(1000);
-        //        } catch (InterruptedException e) {
-        //            e.printStackTrace();
-        //        }
-        //    }
-        //}).start();
+        new Thread(() -> {
+            for (int i = 5; i > 0; i--) {
+                for (Player player : getPlayers()) {
+                    player.sendTitle(String.valueOf(i), "La partie va commencer", 5, 20, 5);
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public UUID getUuid() {

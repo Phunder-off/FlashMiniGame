@@ -32,6 +32,7 @@ game:
 world:
   create:
     success: "Le monde {world} a été créé avec succès ! \nPour vous y rendre, utilisez la commande /world tp {world}."
+    waiting: "Creation du monde ..."
     error: "Une erreur s'est produite lors de la création du monde {world} !"
   load:
     success: "Le monde {world} a été chargé avec succès !"
