@@ -2,24 +2,26 @@ package fr.phunder.flashminigame.game;
 
 import fr.phunder.flashminigame.Plugin;
 import fr.phunder.flashminigame.game.type.GameType;
-import fr.phunder.flashminigame.utils.WorldUtils;
+import fr.phunder.flashminigame.utils.world.WorldUtils;
+import fr.phunder.flashminigame.utils.count.CountdownTimer;
 import fr.phunder.flashminigame.utils.message.MessageType;
 import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public abstract class Game {
 
     private final UUID uuid;
+
     private World world;
     private GameType gameType;
     private UUID owner;
@@ -28,19 +30,22 @@ public abstract class Game {
     private Timestamp timeStart;
     private Timestamp timeEnd;
 
-    public Game(Player player) {
+    protected Game(Player player) {
         this.uuid = UUID.randomUUID();
         this.setOwner(player);
         this.addPlayers(player);
+        setGameStatus(GameStatus.WAITING);
     }
 
-    public void start() {
+    public void prestart() {
+        setGameStatus(GameStatus.STARTING);
+
         final String worldTemplate = "world-fmg-" + this.getGameType().getDisplayName() + "-Template/";
         final String worldName = "game-" + this.getUuid();
 
         MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "world.create.waiting");
         if (!WorldUtils.duplicateWorld(worldTemplate, worldName)) {
-            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.create.error", new HashMap<String,String>(){{
+            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.create.error", new HashMap<String, String>() {{
                 put("{world}", worldName);
             }});
             return;
@@ -48,48 +53,71 @@ public abstract class Game {
 
         final World world = WorldUtils.loadWorld(worldName);
         if (world == null) {
-            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.load.error",new HashMap<String,String>(){{
+            MessageUtils.playerMsg(this.getOwner(), MessageType.ERROR, "world.load.error", new HashMap<String, String>() {{
                 put("{world}", worldName);
             }});
             return;
         }
 
-        this.world = world;
+        this.setWorld(world);
 
-        this.getPlayers().forEach(player -> player.teleport(this.getWorld().getSpawnLocation()));
+        atAllPlayers((Player p) -> p.teleport(this.getWorld().getSpawnLocation()));
 
-        new Thread(() -> {
-            for (int i = 5; i > 0; i--) {
-                for (Player player : getPlayers()) {
-                    player.sendTitle(String.valueOf(i), "La partie va commencer", 5, 20, 5);
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        new CountdownTimer(
+                5,
+                (String time) -> atAllPlayers((Player p) -> p.sendTitle(time, "La partie va commencer", 5, 10, 5)),
+                this::start
+        ).runTaskTimer(Plugin.plugin, 0, 20);
     }
+
+    public void start() {
+        atAllPlayers((Player p) -> p.sendTitle("Good luck !", "La partie commence !", 5, 10, 5));
+
+        setGameStatus(GameStatus.IN_PROGRESS);
+        setTimeStart(new Timestamp(System.currentTimeMillis()));
+    }
+
+    public void end(){
+        atAllPlayers((Player p) -> {
+            p.teleport(Bukkit.getWorld("world").getSpawnLocation());
+            p.sendTitle("Terminer", "La partie est terminer", 5, 20, 5);
+        });
+
+        setGameStatus(GameStatus.FINISHED);
+        setTimeEnd(new Timestamp(System.currentTimeMillis()));
+    }
+
+    protected void atAllPlayers(Consumer<Player> action) {
+        for (Player player : this.getPlayers()) {
+            action.accept(player);
+        }
+    }
+
 
     public UUID getUuid() {
         return uuid;
     }
 
+
     public World getWorld() {
         return world;
     }
+
+    public void setWorld(World world) {
+        this.world = world;
+    }
+
 
     public Player getOwner() {
         return Bukkit.getPlayer(owner);
     }
 
-    public boolean isOwner(Player player) {
-        return getOwner().equals(player);
-    }
-
     public void setOwner(Player owner) {
         this.owner = owner.getUniqueId();
+    }
+
+    public boolean isOwner(Player player) {
+        return getOwner().getUniqueId().equals(player.getUniqueId());
     }
 
     public GameType getGameType() {
@@ -99,6 +127,7 @@ public abstract class Game {
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
     }
+
 
     public List<Player> getPlayers() {
         return players.stream().map(Bukkit::getPlayer).collect(Collectors.toList());
@@ -111,12 +140,13 @@ public abstract class Game {
 
     public void removePlayers(Player player) {
         this.players.remove(player.getUniqueId());
-        if (!getPlayers().isEmpty() && getOwner().equals(player.getUniqueId())) {
+        if (!getPlayers().isEmpty() && getOwner().getUniqueId().equals(player.getUniqueId())) {
             this.setOwner(getPlayers().get(0));
             MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "game.new-owner");
         }
         removePlayerGameMap(player);
     }
+
 
     public GameStatus getGameStatus() {
         return gameStatus;
@@ -126,6 +156,7 @@ public abstract class Game {
         this.gameStatus = gameStatus;
     }
 
+
     public Timestamp getTimeStart() {
         return timeStart;
     }
@@ -133,6 +164,7 @@ public abstract class Game {
     public void setTimeStart(Timestamp timeStart) {
         this.timeStart = timeStart;
     }
+
 
     public Timestamp getTimeEnd() {
         return timeEnd;
@@ -142,9 +174,11 @@ public abstract class Game {
         this.timeEnd = timeEnd;
     }
 
+
     public static Game getPlayerGame(Player player) {
         return Plugin.playerGameMap.get(player.getUniqueId());
     }
+
 
     public static void removePlayerGameMap(Player player) {
         Plugin.playerGameMap.remove(player.getUniqueId());
@@ -153,6 +187,7 @@ public abstract class Game {
     public static void addPlayerGameMap(Player player, Game game) {
         Plugin.playerGameMap.put(player.getUniqueId(), game);
     }
+
 
     public static List<UUID> getPlayerInviteMap(Player player) {
         return Plugin.playerInviteMap.get(player.getUniqueId());
@@ -167,6 +202,4 @@ public abstract class Game {
         playerInviteMap.remove(target.getUniqueId());
         Plugin.playerInviteMap.put(player.getUniqueId(), playerInviteMap);
     }
-
-
 }

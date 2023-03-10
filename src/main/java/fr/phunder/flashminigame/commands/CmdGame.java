@@ -76,7 +76,7 @@ public class CmdGame implements CommandExecutor {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.ower");
                     return true;
                 }
-                game.start();
+                game.prestart();
                 return true;
             }
         }
@@ -154,6 +154,7 @@ public class CmdGame implements CommandExecutor {
                 final Game gameTarget = Game.getPlayerGame(targetPlayer);
                 if (gameTarget == null) {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.exist");
+                    return true;
                 }
                 gameTarget.addPlayers(player);
                 Game.removePlayerInviteMap(player, targetPlayer);

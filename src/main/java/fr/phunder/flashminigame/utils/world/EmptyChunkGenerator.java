@@ -1,4 +1,4 @@
-package fr.phunder.flashminigame.world;
+package fr.phunder.flashminigame.utils.world;
 
 import java.util.Random;
 

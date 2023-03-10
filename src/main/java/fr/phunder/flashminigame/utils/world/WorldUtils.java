@@ -1,4 +1,4 @@
-package fr.phunder.flashminigame.utils;
+package fr.phunder.flashminigame.utils.world;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 public class WorldUtils {
 
@@ -17,8 +18,8 @@ public class WorldUtils {
         Path worldPath = Paths.get("./world/" + worldName);
         Path newWorldPath = Paths.get("./world/" + newWorldName);
 
-        try {
-            Files.walk(worldPath).forEach(sourcePath -> {
+        try (Stream<Path> walk = Files.walk(worldPath)) {
+            walk.forEach(sourcePath -> {
                 try {
                     if (sourcePath.endsWith("uid.dat")) return;
                     Path targetPath = newWorldPath.resolve(worldPath.relativize(sourcePath));

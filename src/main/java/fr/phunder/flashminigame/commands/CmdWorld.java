@@ -3,7 +3,7 @@ package fr.phunder.flashminigame.commands;
 import fr.phunder.flashminigame.utils.CommandUtils;
 import fr.phunder.flashminigame.utils.message.MessageType;
 import fr.phunder.flashminigame.utils.message.MessageUtils;
-import fr.phunder.flashminigame.world.EmptyChunkGenerator;
+import fr.phunder.flashminigame.utils.world.EmptyChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
