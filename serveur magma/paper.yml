@@ -22,25 +22,25 @@ timings:
   history-length: 3600
 settings:
   use-alternative-luck-formula: false
+  enable-player-collisions: true
+  region-file-cache-size: 256
+  suggest-player-names-when-null-tab-completions: true
+  incoming-packet-spam-threshold: 300
+  remove-invalid-statistics: false
+  load-permissions-yml-before-plugins: true
+  save-empty-scoreboard-teams: false
+  player-auto-save-rate: -1
+  max-player-auto-save-per-tick: -1
+  sleep-between-chunk-saves: false
   bungee-online-mode: true
-  save-player-data: true
-  min-chunk-load-threads: 2
   book-size:
     page-max: 2560
     total-multiplier: 0.98
   spam-limiter:
     tab-spam-increment: 10
     tab-spam-limit: 500
-  sleep-between-chunk-saves: false
-  load-permissions-yml-before-plugins: true
-  region-file-cache-size: 256
-  enable-player-collisions: true
-  save-empty-scoreboard-teams: false
-  incoming-packet-spam-threshold: 300
-  player-auto-save-rate: -1
-  max-player-auto-save-per-tick: -1
-  remove-invalid-statistics: false
-  suggest-player-names-when-null-tab-completions: true
+  save-player-data: true
+  min-chunk-load-threads: 2
 messages:
   kick:
     flying-player: Flying is not enabled on this server

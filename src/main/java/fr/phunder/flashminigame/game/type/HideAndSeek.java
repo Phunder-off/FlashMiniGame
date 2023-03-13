@@ -2,6 +2,8 @@ package fr.phunder.flashminigame.game.type;
 
 import fr.phunder.flashminigame.game.Game;
 import fr.phunder.flashminigame.game.GameStatus;
+import fr.phunder.flashminigame.utils.message.MessageType;
+import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -29,6 +31,7 @@ public class HideAndSeek extends Game {
         atAllPlayers(player -> {
             if (!isSeeker(player)){
                 addHider(player);
+                MessageUtils.playerMsg(player, MessageType.INFO, "game.hideAndSeek.hider.new");
             }
         });
         super.start();
@@ -38,24 +41,26 @@ public class HideAndSeek extends Game {
     public void end() {
         clearHiders();
         clearSeekers();
-        Bukkit.unloadWorld(this.getWorld(), false);
-        this.getWorld().getWorldFolder().delete();
+
         super.end();
+    }
+
+    @Override
+    public void removePlayer(Player player) {
+        super.removePlayer(player);
+        if (isSeeker(player)) removeSeeker(player);
+        if (isHider(player)) removeHider(player);
+        if (getSeekers().isEmpty()) randomSeeker();
     }
 
     private void randomSeeker() {
         final Player randomSeeker = getPlayers().get(new Random().nextInt(getPlayers().size() - 1));
         if (getHiders().contains(randomSeeker.getUniqueId())) removeHider(randomSeeker);
         addSeeker(randomSeeker);
+        MessageUtils.playerMsg(randomSeeker, MessageType.INFO, "game.hideAndSeek.seeker.new");
     }
 
-    @Override
-    public void removePlayers(Player player) {
-        super.removePlayers(player);
-        if (isSeeker(player)) removeSeeker(player);
-        if (isHider(player)) removeHider(player);
-        if (getSeekers().isEmpty()) randomSeeker();
-    }
+
 
     public List<UUID> getHiders() {
         return hiders;

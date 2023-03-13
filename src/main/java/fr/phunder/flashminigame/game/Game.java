@@ -6,10 +6,15 @@ import fr.phunder.flashminigame.utils.world.WorldUtils;
 import fr.phunder.flashminigame.utils.count.CountdownTimer;
 import fr.phunder.flashminigame.utils.message.MessageType;
 import fr.phunder.flashminigame.utils.message.MessageUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.FileUtil;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +38,7 @@ public abstract class Game {
     protected Game(Player player) {
         this.uuid = UUID.randomUUID();
         this.setOwner(player);
-        this.addPlayers(player);
+        this.addPlayer(player);
         setGameStatus(GameStatus.WAITING);
     }
 
@@ -41,7 +46,7 @@ public abstract class Game {
         setGameStatus(GameStatus.STARTING);
 
         final String worldTemplate = "world-fmg-" + this.getGameType().getDisplayName() + "-Template/";
-        final String worldName = "game-" + this.getUuid();
+        final String worldName = "game-" + this.getUuid() + "-" + System.currentTimeMillis();
 
         MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "world.create.waiting");
         if (!WorldUtils.duplicateWorld(worldTemplate, worldName)) {
@@ -133,16 +138,16 @@ public abstract class Game {
         return players.stream().map(Bukkit::getPlayer).collect(Collectors.toList());
     }
 
-    public void addPlayers(Player player) {
+    public void addPlayer(Player player) {
         this.players.add(player.getUniqueId());
         addPlayerGameMap(player, this);
     }
 
-    public void removePlayers(Player player) {
+    public void removePlayer(Player player) {
         this.players.remove(player.getUniqueId());
         if (!getPlayers().isEmpty() && getOwner().getUniqueId().equals(player.getUniqueId())) {
             this.setOwner(getPlayers().get(0));
-            MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "game.new-owner");
+            MessageUtils.playerMsg(this.getOwner(), MessageType.INFO, "game.owner.new");
         }
         removePlayerGameMap(player);
     }

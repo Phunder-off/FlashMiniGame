@@ -1,5 +1,6 @@
 package fr.phunder.flashminigame.utils.count;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.function.Consumer;
@@ -12,12 +13,12 @@ public class CountdownTimer extends CountTimer {
 
     @Override
     public void run() {
-        if (getSecondsRemaining() > 0) {
-            getConsumerDuring().accept(String.valueOf(getSecondsRemaining()));
-            setSecondsRemaining(getSecondsRemaining() - 1);
-        } else {
+        if (getSecondsRemaining() < 0) {
             getThenRunnable().run();
-            this.cancel();
+            Bukkit.getScheduler().cancelTask(this.getTaskId());
+            return;
         }
+        getConsumerDuring().accept(String.valueOf(getSecondsRemaining()));
+        setSecondsRemaining(getSecondsRemaining() - 1);
     }
 }

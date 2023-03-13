@@ -27,7 +27,13 @@ game:
   type:
     list: "Voici la liste des modes de jeux : \n{types}"
     not-exist: "Ce mode de jeu n'existe pas !"
-  new-owner: "Tu est devenu chef la partie !"
+  owner:
+    new: "Tu est devenu chef la partie !"
+  hideAndSeek:
+    seeker:
+      new: "Vous êtes le seeker, votre mission est de trouver tous les joueurs cachés et de les tuer."
+    hider:
+      new: "Vous êtes maintenant un hider dans le jeu de cache-cache. \nBonne chance pour vous cacher et éviter le seeker !"
 
 world:
   create:

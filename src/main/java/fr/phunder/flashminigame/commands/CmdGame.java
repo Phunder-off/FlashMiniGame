@@ -43,7 +43,7 @@ public class CmdGame implements CommandExecutor {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.in");
                     return true;
                 }
-                game.removePlayers(player);
+                game.removePlayer(player);
                 MessageUtils.playerMsg(player, MessageType.INFO, "game.leave");
                 return true;
             }
@@ -156,7 +156,7 @@ public class CmdGame implements CommandExecutor {
                     MessageUtils.playerMsg(player, MessageType.ERROR, "game.not.exist");
                     return true;
                 }
-                gameTarget.addPlayers(player);
+                gameTarget.addPlayer(player);
                 Game.removePlayerInviteMap(player, targetPlayer);
 
                 MessageUtils.playerMsg(player, MessageType.INFO, "game.join.guest",
@@ -188,7 +188,7 @@ public class CmdGame implements CommandExecutor {
                     return true;
                 }
 
-                game.removePlayers(targetPlayer);
+                game.removePlayer(targetPlayer);
                 MessageUtils.playerMsg(
                         player,
                         MessageType.INFO,
