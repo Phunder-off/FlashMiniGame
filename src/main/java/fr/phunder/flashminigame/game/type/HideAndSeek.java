@@ -7,6 +7,8 @@ import fr.phunder.flashminigame.utils.message.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ public class HideAndSeek extends Game {
 
     @Override
     public void start() {
+
+
         randomSeeker();
 
         atAllPlayers(player -> {
@@ -50,7 +54,7 @@ public class HideAndSeek extends Game {
         super.removePlayer(player);
         if (isSeeker(player)) removeSeeker(player);
         if (isHider(player)) removeHider(player);
-        if (getSeekers().isEmpty()) randomSeeker();
+        if (!getSeekers().isEmpty()) randomSeeker();
     }
 
     private void randomSeeker() {
@@ -59,7 +63,6 @@ public class HideAndSeek extends Game {
         addSeeker(randomSeeker);
         MessageUtils.playerMsg(randomSeeker, MessageType.INFO, "game.hideAndSeek.seeker.new");
     }
-
 
 
     public List<UUID> getHiders() {
